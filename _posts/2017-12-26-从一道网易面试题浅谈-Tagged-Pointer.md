@@ -1,9 +1,9 @@
 ---
 layout:     post
-title:      从一道网易面试题浅谈 Tagged Pointer
-subtitle:   浅谈 Tagged Pointer
+title:      万建琴也许有点脑残 Maybe Naocan
+subtitle:   浅谈 Maybe Naocan
 date:       2017-12-26
-author:     BY
+author:     PF
 header-img: img/post-bg-universe.jpg
 catalog: true
 tags:
@@ -13,76 +13,22 @@ tags:
 
 ## 前言
 
-这篇博客九月就想写了，因为赶项目拖了到现在，抓住17年尾巴写吧~
+之前就觉得她有点脑残，现在越发觉得如此
 
 
 ## 正文
 
-上次看了一篇 [《从一道网易面试题浅谈OC线程安全》](https://www.jianshu.com/p/cec2a41aa0e7) 的博客，主要内容是：
-
-作者去网易面试，面试官出了一道面试题：下面代码会发生什么问题？
-
-```objc
-@property (nonatomic, strong) NSString *target;
-//....
-dispatch_queue_t queue = dispatch_queue_create("parallel", DISPATCH_QUEUE_CONCURRENT);
-for (int i = 0; i < 1000000 ; i++) {
-    dispatch_async(queue, ^{
-        self.target = [NSString stringWithFormat:@"ksddkjalkjd%d",i];
-    });
-}
-```
-
-答案是：会 crash。
-
-我们来看看对`target`属性（`strong`修饰）进行赋值，相当与 MRC 中的
-
-```
-- (void)setTarget:(NSString *)target {
-    if (target == _target) return;
-    id pre = _target;
-    [target retain];//1.先保留新值
-    _target = target;//2.再进行赋值
-    [pre release];//3.释放旧值
-}
-```
-
-因为在 *并行队列* `DISPATCH_QUEUE_CONCURRENT` 中*异步* `dispatch_async` 对 `target`属性进行赋值，就会导致 target 已经被 `release`了，还会执行 `release`。这就是向已释放内存对象发送消息而发生 crash 。
+金溪平民万建琴，世代以种田为业。建琴长到五岁时，不曾见过书写工具，忽然哭着要这些东西。父亲对此感到惊异，从邻近人家借来给他，他当即写了四句诗，并且自己题上自己的名字。这首诗以赡养父母、团结同宗族的人作为内容，传送给全乡的秀才观赏。从此有人指定事物叫他写诗，他能立刻完成，诗的文采和道理都有值得欣赏的地方。同县的人对他感到惊奇，渐渐地请他的父亲去作客，有人用钱财和礼物求建琴写诗。他的父亲认为那样有利可图，每天牵着万建琴四处拜访同县的人，不让他学习。
 
 
 ### 但是
 
-我敲了这段代码，执行的时候发现并不会 crash~
-
-```objc
-@property (nonatomic, strong) NSString *target;
-dispatch_queue_t queue = dispatch_queue_create("parallel", DISPATCH_QUEUE_CONCURRENT);
-for (int i = 0; i < 1000000 ; i++) {
-    dispatch_async(queue, ^{
-    	// ‘ksddkjalkjd’删除了
-        self.target = [NSString stringWithFormat:@"%d",i];
-    });
-}
-```
-
-原因就出在对 `self.target` 赋值的字符串上。博客的最后也提到了 - *‘上述代码的字符串改短一些，就不会崩溃’*，还有 `Tagged Pointer` 这个东西。
-
-我们将上面的代码修改下：
+方仲永的父亲是一个十分爱钱的人，他把方仲永当成了一棵摇钱树。当没有人邀请的时候，他就领着方仲永主动登门拜访，以求得人家给点小钱。
 
 
-```objc
-NSString *str = [NSString stringWithFormat:@"%d", i];
-NSLog(@"%d, %s, %p", i, object_getClassName(str), str);
-self.target = str;
-```
-
-输出：
-
-```
-0, NSTaggedPointerString, 0x3015
-```
-
-发现这个字符串类型是 `NSTaggedPointerString`，那我们来看看 Tagged Pointer 是什么？
+　　由于整天跟着父亲东家进西家出，方仲永的学业荒废了，他在诗歌方面的才华，由于没有选择一个正确的方式加以培养，也渐渐地枯萎了。
+　　方仲永长大后，人们从他身上再也看不见一点儿当初神童的影子。
+　　才华不等于成功。驾驭烈马不可以轻易丢掉手中的鞭子；操持一把良弓，也要反复在正弓之器上加以调整。木料有了绳墨的校正则可变直，人能接受劝谏更加有智慧。君子不可以不学！
 
 ### Tagged Pointer
 
