@@ -1,5 +1,5 @@
 # Site settings
-title: BY Blog
+title: PF Blog
 SEOTitle: 夏鹏飞的博客 | PF Blog
 header-img: img/post-bg-desk.jpg
 email: 18779145695@163.com
@@ -21,7 +21,7 @@ RSS: false
 # weibo_username:     qiubaiying
 zhihu_username:     laoxia123
 github_username:    laoxia123
-facebook_username:  baiying.qiu.7
+facebook_username:  pengfei.xia.7
 jianshu_username:   e71990ada2fd
 #twitter_username:   qiubaiying
 
@@ -102,7 +102,7 @@ friends: [
         title: "WY",
         href: "http://zhengwuyang.com"
     },{
-        title: "简书·BY",
+        title: "简书·PF",
         href: "http://www.jianshu.com/u/e71990ada2fd"
     },{
         title: "Apple",
