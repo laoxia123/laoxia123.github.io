@@ -1,0 +1,23 @@
+
+# oracle中常见问题汇总
+
+### 问题1：ORA-12560: TNS: 协议适配器错误 解决方法
+##### 解决方法
+ 一：检查监听口是否开启。在开始-运行，输入services.msc或者在控制面板-管理工具，进入服务。找到OracleOraDb11g_home1TNSListener，检查是否开启。 
+    二：检查实例的服务是否开启。同步骤1，进入服务，找到OracleService数据库名，检查是否开启。 
+    三：找到xxxxx\product\11.2.0\dbhome_1\NETWORK\ADMIN文件夹下的listener.ora文件和tnsnames.ora文件 
+查看
+
+LISTENER_ORCL =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+即HOST=xxxxxx都修改成为HOST = localhost 或者是当前ip地址（地址可能和本机地址不匹配） 
+重新执行lsnrctl start
+### 问题2：ORACLE数据库找回用户密码
+安装完oracle数据库后，登录时sys,system,scott这几个用户密码输入后都不对，查阅资料后解决
+1，cmd下输入sqlplus,之后让你输入用户名，输入这个 "/as sysdba" ,之后输入"alter user (用户名) identified by (密码);"
+因为我要用scott这个用户，但是使用刚才sql语句修改scott这个用户时，怎么改都不生效，很奇怪，遂用这个sql语句修改
+sys这个用户，修改成功。
+###问题3： ORA-28000: the account is locked-的解决办法
+输入这个 "/as sysdba" 
+alter user scott account unlock;
+commit;
